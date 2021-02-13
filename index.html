@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch API</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" href="styles.css"> -->
+</head>
+<body>    
+    <div class="container">
+        <h2 class="mb-4 display-4" >Fetch API and Form Entry</h2>
+        <h3 class="mb-4"> Fetch data: </h3>
+        <div class="d-flex mb-4">
+            <button id="getText" class="btn btn-warning mr-4">Get Text from file</button>
+            <button id="getUsers" class="btn btn-primary mr-4">Get JSON from file</button>
+            <button id="getPosts" class="btn btn-success mr-4">Get API</button>
+        </div>
+               
+        <div id="output"></div>    
+        <hr>
+        <br>
+        <h3 class="mb-4"> Form Entry: </h3>
+        <form class="form-group" id="add-post">
+            <div>
+                <label for="title">Post Title</label>
+                <input type="text" class="form-control mb-4" id="title" placeholder="Title">
+            </div>
+            <div>
+                <label for="body">Enter Post content</label>
+                <textarea class="form-control mb-4" id="body" placeholder="Enter post"></textarea>
+            </div>
+            <input type="submit" class="btn btn-secondary" value="submit">        
+        </form>
+
+    </div>
+
+
+    <script>    
+        document.getElementById("getText").addEventListener("click", displayText)
+        document.getElementById("getUsers").addEventListener("click", displayUsers)
+        document.getElementById("getPosts").addEventListener("click", displayPosts)
+        document.getElementById("add-post").addEventListener("submit", addPost)
+    
+        
+        function displayText(){
+            fetch('sample.txt')
+            .then(res => res.text())
+            .then (function (data) {
+                let output = `<h4>Sample text</h4>`
+                output+=data  
+                document.getElementById("output").innerHTML=output
+            })               
+            .catch(err=>console.log(err))
+        }
+
+        function displayUsers(){
+            fetch("users.json")
+            .then(res => res.json())
+            .then(function (data){
+                console.log(data)//for debugginng
+                let output = `<h4>Users from file</h4>`                                       
+                data.forEach(user =>{
+                    output+=`<ul class="list-group mb-3"> 
+                                <li class="list-group-item font-weight-bold">id: ${user.id}</li>
+                                <li class="list-group-item">name: ${user.name}</li>
+                                <li class="list-group-item">email: ${user.email}</li>
+                            </ul>`
+                })
+                document.getElementById("output").innerHTML= output
+                // console.log(output)
+            })
+            .catch(err => console.log(err))    
+        } 
+                
+        function displayPosts(){            
+            fetch("https://jsonplaceholder.typicode.com/posts")
+            .then(res => res.json())
+            .then(posts =>{                
+                let output = `<h4 class="mb-3">100 Posts from API</h4>`
+                posts.forEach(function (post){
+                  output+=`<div class="card card-body mb-3">
+                            <h5>title: ${post.title}</h5>
+                            <p>body: ${post.body}</p>                   
+                           </div>` 
+                })
+
+                document.getElementById("output").innerHTML = output
+                // console.log(output)
+            })
+            .catch(err => console.log(err))
+        } 
+        
+        
+        function addPost(e){
+
+            e.preventDefault()
+            alert("check the 'console.log' for new form entry")
+            let title = document.getElementById("title").value
+            let body= document.getElementById("body").value
+
+            fetch('https://jsonplaceholder.typicode.com/posts', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json; charset=UTF-8',
+                },
+                body: JSON.stringify({title:title, body:body}),
+                
+            })
+            .then((res) => res.json())
+            .then((posts) => console.log(posts));
+        }
+        
+    </script>
+    
+</body>
+</html>
